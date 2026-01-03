@@ -15,7 +15,7 @@ export default function Listings() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sharingType, setSharingType] = useState<string>('all');
   const [selectedCity, setSelectedCity] = useState<string>('all');
-  const [maxRent, setMaxRent] = useState<number>(25000);
+  const [maxRent, setMaxRent] = useState<number>(10000);
   const [showFilters, setShowFilters] = useState(false);
 
   const approvedListings = mockListings.filter(l => l.status === 'approved');
@@ -39,10 +39,10 @@ export default function Listings() {
     setSearchQuery('');
     setSharingType('all');
     setSelectedCity('all');
-    setMaxRent(25000);
+    setMaxRent(10000);
   };
 
-  const hasFilters = searchQuery || sharingType !== 'all' || selectedCity !== 'all' || maxRent < 25000;
+  const hasFilters = searchQuery || sharingType !== 'all' || selectedCity !== 'all' || maxRent < 10000;
 
   return (
     <Layout>
@@ -53,9 +53,9 @@ export default function Listings() {
             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
               <Home className="w-5 h-5 text-primary" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground">Browse Rooms</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">Find Your Perfect Stay</h1>
           </div>
-          <p className="text-muted-foreground ml-13">Discover verified PGs, shared flats, and co-living spaces across India</p>
+          <p className="text-muted-foreground ml-13">Affordable PGs, shared rooms & hostels for students across India 🎓</p>
         </div>
 
         {/* Search & Filters */}
@@ -117,8 +117,8 @@ export default function Listings() {
                 <Slider
                   value={[maxRent]}
                   onValueChange={([value]) => setMaxRent(value)}
-                  max={30000}
-                  min={3000}
+                  max={15000}
+                  min={2000}
                   step={500}
                   className="w-28"
                 />
@@ -172,8 +172,8 @@ export default function Listings() {
                 <Slider
                   value={[maxRent]}
                   onValueChange={([value]) => setMaxRent(value)}
-                  max={30000}
-                  min={3000}
+                  max={15000}
+                  min={2000}
                   step={500}
                 />
               </div>
@@ -204,8 +204,10 @@ export default function Listings() {
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
               <Search className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h3 className="text-xl font-bold text-foreground mb-2">No properties found</h3>
-            <p className="text-muted-foreground mb-6">Try adjusting your filters or search in a different city</p>
+            <h3 className="text-xl font-bold text-foreground mb-2">No rooms found in your budget yet 😕</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              Don't worry! Try increasing your budget or checking other cities. New affordable PGs are added daily.
+            </p>
             <Button variant="outline" onClick={clearFilters} className="gap-2">
               <X className="w-4 h-4" />
               Clear All Filters
