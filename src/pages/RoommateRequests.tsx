@@ -84,7 +84,7 @@ export default function RoommateRequests() {
                       </div>
                       <div>
                         <p className="text-xs text-muted-foreground">Budget</p>
-                        <p className="font-medium text-foreground">${request.budget}/mo</p>
+                        <p className="font-medium text-foreground">₹{request.budget.toLocaleString('en-IN')}/mo</p>
                       </div>
                     </div>
                     

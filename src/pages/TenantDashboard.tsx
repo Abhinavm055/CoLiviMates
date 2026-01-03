@@ -92,8 +92,8 @@ export default function TenantDashboard() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="budget">Budget ($)</Label>
-                      <Input id="budget" type="number" placeholder="1000" required />
+                      <Label htmlFor="budget">Budget (₹)</Label>
+                      <Input id="budget" type="number" placeholder="10000" required />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="sharingType">Preferred Type</Label>
@@ -112,7 +112,7 @@ export default function TenantDashboard() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="location">Preferred Location</Label>
-                    <Input id="location" placeholder="Manhattan, New York" required />
+                    <Input id="location" placeholder="Koramangala, Bengaluru" required />
                   </div>
                   <Button type="submit" className="w-full">Post Request</Button>
                 </form>
@@ -181,8 +181,8 @@ export default function TenantDashboard() {
                         <p className="text-muted-foreground mb-4">{request.description}</p>
                         <div className="flex flex-wrap gap-4 text-sm">
                           <span className="flex items-center gap-1 text-muted-foreground">
-                            <DollarSign className="w-4 h-4" />
-                            Budget: ${request.budget}/mo
+                            <span className="font-medium">₹</span>
+                            Budget: ₹{request.budget.toLocaleString('en-IN')}/mo
                           </span>
                           <span className="flex items-center gap-1 text-muted-foreground">
                             <MapPin className="w-4 h-4" />
