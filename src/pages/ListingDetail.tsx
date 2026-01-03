@@ -152,7 +152,7 @@ export default function ListingDetail() {
             <Card className="card-elevated">
               <CardContent className="p-6">
                 <div className="flex items-baseline gap-1 mb-6">
-                  <span className="text-4xl font-bold text-foreground">${listing.rent}</span>
+                  <span className="text-4xl font-bold text-foreground">₹{listing.rent.toLocaleString('en-IN')}</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
 

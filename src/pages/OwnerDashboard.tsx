@@ -105,8 +105,8 @@ export default function OwnerDashboard() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="rent">Monthly Rent ($)</Label>
-                    <Input id="rent" type="number" placeholder="850" required />
+                    <Label htmlFor="rent">Monthly Rent (₹)</Label>
+                    <Input id="rent" type="number" placeholder="12000" required />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="sharingType">Room Type</Label>
@@ -125,12 +125,12 @@ export default function OwnerDashboard() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="location">Address</Label>
-                    <Input id="location" placeholder="123 Main St" required />
+                    <Label htmlFor="location">Locality</Label>
+                    <Input id="location" placeholder="Koramangala 4th Block" required />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="city">City</Label>
-                    <Input id="city" placeholder="New York" required />
+                    <Input id="city" placeholder="Bengaluru" required />
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -190,7 +190,7 @@ export default function OwnerDashboard() {
                         </div>
                         <h3 className="font-semibold text-lg text-foreground mb-1">{listing.title}</h3>
                         <p className="text-muted-foreground text-sm mb-2">{listing.location}, {listing.city}</p>
-                        <p className="text-foreground font-medium">${listing.rent}/month</p>
+                        <p className="text-foreground font-medium">₹{listing.rent.toLocaleString('en-IN')}/month</p>
                       </div>
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" className="gap-1">
