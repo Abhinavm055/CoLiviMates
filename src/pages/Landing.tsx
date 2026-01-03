@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Layout } from '@/components/layout/Layout';
-import { Search, Home, Users, Shield, ArrowRight, CheckCircle, Star, MapPin } from 'lucide-react';
+import { Search, Home, Users, Shield, ArrowRight, CheckCircle, Star, MapPin, GraduationCap, Sparkles, IndianRupee } from 'lucide-react';
 
 const popularCities = ['Bengaluru', 'Chennai', 'Pune', 'Hyderabad', 'Coimbatore', 'Kochi'];
 
@@ -14,19 +14,19 @@ export default function Landing() {
           <div className="container mx-auto px-4 py-24 md:py-32">
             <div className="max-w-4xl mx-auto text-center">
               <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6 animate-fade-in">
-                <Star className="w-4 h-4 text-warning fill-warning" />
-                <span className="text-primary-foreground/90 text-sm font-medium">Trusted by 10,000+ students & professionals</span>
+                <GraduationCap className="w-4 h-4 text-warning fill-warning" />
+                <span className="text-primary-foreground/90 text-sm font-medium">Trusted by 10,000+ students & freshers</span>
               </div>
               
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-primary-foreground mb-6 animate-slide-up leading-tight">
-                Your New Home Away
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-primary-foreground mb-6 animate-slide-up leading-tight">
+                Affordable PGs & Rooms
                 <br />
-                <span className="text-accent">From Home</span>
+                <span className="text-accent">For Students Like You</span>
               </h1>
               
               <p className="text-lg md:text-xl text-primary-foreground/85 mb-8 animate-slide-up max-w-2xl mx-auto" style={{ animationDelay: '0.1s' }}>
-                Find affordable PGs, shared flats, and compatible roommates across India. 
-                Safe, verified, and hassle-free – just like home!
+                Find budget-friendly PGs, shared rooms & compatible roommates near your college. 
+                Starting from just <span className="font-bold text-accent">₹3,000/month</span> – no brokers, no hassle! 🎓
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up" style={{ animationDelay: '0.2s' }}>
@@ -155,10 +155,10 @@ export default function Landing() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: Shield, title: 'Verified Listings', desc: 'Every listing is reviewed and verified by our team' },
-              { icon: Users, title: 'Find Flatmates', desc: 'Connect with compatible roommates who share your lifestyle' },
-              { icon: CheckCircle, title: 'Safe & Private', desc: 'Your contact details are shared only after owner approval' },
-              { icon: Home, title: 'All Budgets', desc: 'From ₹4,000 PGs to ₹20,000 premium co-living spaces' },
+              { icon: GraduationCap, title: 'Made for Students', desc: 'Budget-friendly options starting from ₹3,000/month' },
+              { icon: Shield, title: 'Verified Listings', desc: 'Every PG is reviewed and verified by our team' },
+              { icon: Users, title: 'Find Flatmates', desc: 'Connect with students who share your vibe' },
+              { icon: Sparkles, title: 'Zero Brokerage', desc: 'No hidden fees – save money for what matters' },
             ].map((feature, i) => (
               <div key={i} className="bg-card rounded-2xl p-6 card-elevated text-center border border-border/50">
                 <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center mx-auto mb-4">
@@ -182,10 +182,10 @@ export default function Landing() {
             
             <div className="relative z-10">
               <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-4">
-                Ready to Find Your New Home?
+                Your Perfect PG is Waiting! 🏠
               </h2>
               <p className="text-primary-foreground/85 text-lg mb-8 max-w-2xl mx-auto">
-                Join thousands of students and working professionals who found their perfect stay through StayNest. Start your search today!
+                Join thousands of students and freshers who found affordable stays through StayNest. Start your search today – it's 100% free!
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link to="/listings">

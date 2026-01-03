@@ -58,6 +58,14 @@ export default {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
         },
+        student: {
+          DEFAULT: "hsl(var(--student))",
+          foreground: "hsl(var(--student-foreground))",
+        },
+        budget: {
+          DEFAULT: "hsl(var(--budget))",
+          foreground: "hsl(var(--budget-foreground))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

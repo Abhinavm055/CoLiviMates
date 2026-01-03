@@ -3,7 +3,7 @@ import { mockRoommateRequests } from '@/data/mockData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, DollarSign, Users, Calendar, MessageCircle } from 'lucide-react';
+import { MapPin, Users, Calendar, MessageCircle, IndianRupee, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -43,8 +43,8 @@ export default function RoommateRequests() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">Find Roommates</h1>
-            <p className="text-muted-foreground">Connect with people looking for compatible roommates</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Find Your Perfect Roommate 👋</h1>
+            <p className="text-muted-foreground">Connect with students & freshers looking for compatible flatmates</p>
           </div>
           
           {user && (user.role === 'tenant' || user.role === 'roommate_seeker') && (
@@ -80,7 +80,7 @@ export default function RoommateRequests() {
                   <div className="grid grid-cols-2 gap-4 mb-6">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <DollarSign className="w-4 h-4 text-primary" />
+                        <IndianRupee className="w-4 h-4 text-primary" />
                       </div>
                       <div>
                         <p className="text-xs text-muted-foreground">Budget</p>
@@ -114,14 +114,17 @@ export default function RoommateRequests() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16">
+          <div className="text-center py-16 bg-card rounded-2xl border border-border/50">
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
               <Users className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h3 className="text-xl font-semibold text-foreground mb-2">No Active Requests</h3>
-            <p className="text-muted-foreground mb-4">Be the first to post a roommate request!</p>
+            <h3 className="text-xl font-semibold text-foreground mb-2">No roommate requests yet 😕</h3>
+            <p className="text-muted-foreground mb-4 max-w-md mx-auto">Be the first to post! Share your preferences and find your ideal flatmate.</p>
             <Link to="/auth?mode=signup">
-              <Button>Get Started</Button>
+              <Button className="gap-2">
+                <Sparkles className="w-4 h-4" />
+                Post Your Request
+              </Button>
             </Link>
           </div>
         )}
