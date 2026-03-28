@@ -53,9 +53,9 @@ export default function Listings() {
             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
               <Home className="w-5 h-5 text-primary" />
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">Find Your Perfect Stay</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">Find Flatmates. Share Rent. Save Money.</h1>
           </div>
-          <p className="text-muted-foreground ml-13">Affordable PGs, shared rooms & hostels for students across India 🎓</p>
+          <p className="text-muted-foreground ml-13">Budget-friendly rooms across India for students balancing classes, commute, and monthly expenses.</p>
         </div>
 
         {/* Search & Filters */}

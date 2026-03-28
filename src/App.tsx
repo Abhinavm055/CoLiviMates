@@ -13,6 +13,8 @@ import OwnerDashboard from "./pages/OwnerDashboard";
 import TenantDashboard from "./pages/TenantDashboard";
 import AdminPanel from "./pages/AdminPanel";
 import NotFound from "./pages/NotFound";
+import Rooms from "./pages/Rooms";
+import Roommates from "./pages/Roommates";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +34,8 @@ const App = () => (
             <Route path="/owner-dashboard" element={<OwnerDashboard />} />
             <Route path="/tenant-dashboard" element={<TenantDashboard />} />
             <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/rooms" element={<Rooms />} />
+            <Route path="/roommates" element={<Roommates />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

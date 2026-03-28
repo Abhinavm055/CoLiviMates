@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Layout } from '@/components/layout/Layout';
-import { Search, Home, Users, Shield, ArrowRight, CheckCircle, Star, MapPin, GraduationCap, Sparkles, IndianRupee } from 'lucide-react';
+import { Search, Home, Users, Shield, ArrowRight, MapPin, GraduationCap, Sparkles } from 'lucide-react';
 
 const popularCities = ['Bengaluru', 'Chennai', 'Pune', 'Hyderabad', 'Coimbatore', 'Kochi'];
 
@@ -15,18 +15,15 @@ export default function Landing() {
             <div className="max-w-4xl mx-auto text-center">
               <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6 animate-fade-in">
                 <GraduationCap className="w-4 h-4 text-warning fill-warning" />
-                <span className="text-primary-foreground/90 text-sm font-medium">Trusted by 10,000+ students & freshers</span>
+                <span className="text-primary-foreground/90 text-sm font-medium">CoLiveMates • Budget-first roommate matching</span>
               </div>
               
               <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-primary-foreground mb-6 animate-slide-up leading-tight">
-                Affordable PGs & Rooms
-                <br />
-                <span className="text-accent">For Students Like You</span>
+                Find Roommates. Share Rent. Live Better.
               </h1>
               
               <p className="text-lg md:text-xl text-primary-foreground/85 mb-8 animate-slide-up max-w-2xl mx-auto" style={{ animationDelay: '0.1s' }}>
-                Find budget-friendly PGs, shared rooms & compatible roommates near your college. 
-                Starting from just <span className="font-bold text-accent">₹3,000/month</span> – no brokers, no hassle! 🎓
+                Connect with verified students and professionals near you.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up" style={{ animationDelay: '0.2s' }}>
@@ -84,10 +81,10 @@ export default function Landing() {
           <div className="text-center mb-16">
             <span className="inline-block text-primary font-semibold text-sm uppercase tracking-wider mb-3">Simple Process</span>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Find Your Perfect Stay in 3 Easy Steps
+              How It Works for Students
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              No brokers, no hassle. Just simple, direct connections between you and verified property owners.
+              From tight budgets to incompatible flatmates, CoLiveMates helps you solve real roommate problems faster.
             </p>
           </div>
 
@@ -182,10 +179,10 @@ export default function Landing() {
             
             <div className="relative z-10">
               <h2 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-4">
-                Your Perfect PG is Waiting! 🏠
+                CoLiveMates is built for shared living in India
               </h2>
               <p className="text-primary-foreground/85 text-lg mb-8 max-w-2xl mx-auto">
-                Join thousands of students and freshers who found affordable stays through StayNest. Start your search today – it's 100% free!
+                Find roommates. Share rent. Live better. Whether you're moving for college or your first job, start with people and plans that fit your budget.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link to="/listings">

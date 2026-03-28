@@ -1,13 +1,15 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { Home, LogOut, User, Menu, X } from 'lucide-react';
+import { Home, LogOut, User, Menu, X, Moon, Sun } from 'lucide-react';
 import { useState } from 'react';
+import { useTheme } from '@/hooks/useTheme';
 
 export function Header() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const handleLogout = () => {
     logout();
@@ -38,7 +40,7 @@ export function Header() {
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center group-hover:scale-105 transition-transform">
               <Home className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-lg text-foreground hidden sm:block">CoLiving</span>
+            <span className="font-bold text-lg text-foreground hidden sm:block">CoLiveMates</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -53,6 +55,9 @@ export function Header() {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" className="transition-colors duration-300">
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </Button>
             {user ? (
               <>
                 <Link to={getDashboardLink()}>
@@ -106,6 +111,10 @@ export function Header() {
                 Find Roommates
               </Link>
               <div className="border-t border-border pt-4 flex flex-col gap-2">
+                <Button variant="ghost" onClick={toggleTheme} className="w-full justify-start gap-2">
+                  {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                  {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                </Button>
                 {user ? (
                   <>
                     <Link to={getDashboardLink()} onClick={() => setMobileMenuOpen(false)}>

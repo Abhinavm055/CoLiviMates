@@ -63,14 +63,14 @@
   }
 
   .dark {
-    --background: 260 20% 8%;
-    --foreground: 35 20% 95%;
+    --background: 222 47% 11%;
+    --foreground: 0 0% 100%;
 
-    --card: 260 18% 12%;
-    --card-foreground: 35 20% 95%;
+    --card: 215 28% 17%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 260 18% 12%;
-    --popover-foreground: 35 20% 95%;
+    --popover: 215 28% 17%;
+    --popover-foreground: 0 0% 100%;
 
     --primary: 168 60% 45%;
     --primary-foreground: 0 0% 100%;
@@ -114,7 +114,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground font-sans antialiased transition-colors duration-300;
     font-family: 'Plus Jakarta Sans', sans-serif;
   }
 
