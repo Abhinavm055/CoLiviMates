@@ -1,0 +1,196 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+@layer base {
+  :root {
+    --background: 35 30% 97%;
+    --foreground: 25 20% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 25 20% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 25 20% 12%;
+
+    --primary: 168 65% 38%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 45 40% 94%;
+    --secondary-foreground: 25 30% 18%;
+
+    --muted: 40 25% 91%;
+    --muted-foreground: 25 15% 42%;
+
+    --accent: 14 90% 58%;
+    --accent-foreground: 0 0% 100%;
+    
+    --student: 45 95% 55%;
+    --student-foreground: 25 30% 15%;
+    
+    --budget: 152 60% 42%;
+    --budget-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 35 20% 86%;
+    --input: 35 20% 86%;
+    --ring: 168 65% 38%;
+
+    --radius: 0.875rem;
+
+    --success: 152 60% 40%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 25 20% 12%;
+
+    --hero-gradient: linear-gradient(135deg, hsl(168 65% 38%) 0%, hsl(168 55% 32%) 50%, hsl(175 60% 28%) 100%);
+    --card-shadow: 0 4px 24px -6px hsl(168 30% 20% / 0.1);
+    --card-shadow-hover: 0 16px 40px -12px hsl(168 30% 20% / 0.18);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 168 65% 38%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 45 40% 95%;
+    --sidebar-accent-foreground: 25 20% 12%;
+    --sidebar-border: 40 25% 90%;
+    --sidebar-ring: 168 65% 38%;
+  }
+
+  .dark {
+    --background: 260 20% 8%;
+    --foreground: 35 20% 95%;
+
+    --card: 260 18% 12%;
+    --card-foreground: 35 20% 95%;
+
+    --popover: 260 18% 12%;
+    --popover-foreground: 35 20% 95%;
+
+    --primary: 168 60% 45%;
+    --primary-foreground: 0 0% 100%;
+    
+    --student: 45 90% 50%;
+    --student-foreground: 25 30% 12%;
+    
+    --budget: 152 55% 45%;
+    --budget-foreground: 0 0% 100%;
+
+    --secondary: 260 15% 18%;
+    --secondary-foreground: 35 20% 90%;
+
+    --muted: 260 12% 20%;
+    --muted-foreground: 260 10% 58%;
+
+    --accent: 24 95% 53%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 260 15% 20%;
+    --input: 260 15% 20%;
+    --ring: 168 60% 45%;
+
+    --sidebar-background: 260 18% 10%;
+    --sidebar-foreground: 35 20% 95%;
+    --sidebar-primary: 168 60% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 260 12% 18%;
+    --sidebar-accent-foreground: 35 20% 95%;
+    --sidebar-border: 260 15% 18%;
+    --sidebar-ring: 168 60% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  .hero-gradient {
+    background: var(--hero-gradient);
+  }
+
+  .card-elevated {
+    box-shadow: var(--card-shadow);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+
+  .card-elevated:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-2px);
+  }
+
+  .btn-accent {
+    @apply bg-accent text-accent-foreground hover:opacity-90 transition-all duration-200;
+  }
+
+  .badge-verified {
+    @apply bg-success text-success-foreground;
+  }
+
+  .badge-pending {
+    @apply bg-warning text-warning-foreground;
+  }
+
+  .badge-student {
+    background: hsl(var(--student));
+    color: hsl(var(--student-foreground));
+  }
+
+  .badge-budget {
+    background: hsl(var(--budget));
+    color: hsl(var(--budget-foreground));
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.6s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
