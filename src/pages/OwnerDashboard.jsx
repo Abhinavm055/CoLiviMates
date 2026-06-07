@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { useAuth } from '@/contexts/AuthContext';
-import { mockListings, mockContactRequests } from '@/data/mockData';
+import { listingsAPI } from '@/lib/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,47 +12,125 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Home, MessageSquare, Eye, Edit, Trash2, CheckCircle, Clock, XCircle, Mail, Calendar } from 'lucide-react';
-import { Navigate } from 'react-router-dom';
+import { Plus, Home, MessageSquare, Eye, Edit, Trash2, CheckCircle, Clock, XCircle, Mail, Calendar, Loader2, AlertCircle } from 'lucide-react';
+import { Navigate, Link } from 'react-router-dom';
 
 export default function OwnerDashboard() {
   const { user } = useAuth();
   const { toast } = useToast();
+
+  const [myListings, setMyListings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Listing creation form states
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [rent, setRent] = useState('');
+  const [sharingType, setSharingType] = useState('single');
+  const [location, setLocation] = useState('');
+  const [city, setCity] = useState('');
+  const [facilities, setFacilities] = useState('');
+
+  const fetchListings = async () => {
+    if (!user) return;
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await listingsAPI.getAll({ limit: 200 }); // Retrieve a large set to filter locally
+      const filtered = data.listings.filter(l => l.owner_id === user.id);
+      setMyListings(filtered);
+    } catch (err) {
+      console.error('Failed to load owner listings:', err);
+      setError('Could not load your listings. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchListings();
+  }, [user]);
 
   if (!user || user.role !== 'owner') return <Navigate to="/auth" replace />;
 
-  const myListings = mockListings.filter(l => l.ownerId === user.id || l.ownerId === '2');
-  const myRequests = mockContactRequests.filter(r => r.toOwnerId === user.id || r.toOwnerId === '2');
+  const handleCreateListing = async (e) => {
+    e.preventDefault();
+    if (parseInt(rent) <= 0) {
+      toast({ title: 'Invalid Rent', description: 'Rent must be greater than 0.', variant: 'destructive' });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const facilitiesArray = facilities ? facilities.split(',').map(f => f.trim()).filter(Boolean) : [];
+      
+      await listingsAPI.create({
+        title,
+        description,
+        rent: parseInt(rent),
+        sharing_type: sharingType,
+        location,
+        city,
+        facilities: facilitiesArray,
+        images: [], // Default empty array as expected
+        available_from: new Date().toISOString().split('T')[0] // default to today
+      });
+
+      toast({ title: 'Listing Submitted!', description: 'Your listing is now live and pending review.' });
+      setIsDialogOpen(false);
+      
+      // Clear form states
+      setTitle('');
+      setDescription('');
+      setRent('');
+      setSharingType('single');
+      setLocation('');
+      setCity('');
+      setFacilities('');
+
+      // Refresh listing items
+      fetchListings();
+    } catch (err) {
+      console.error('Create listing error:', err);
+      toast({ title: 'Failed to create listing', description: err.response?.data?.error || err.message, variant: 'destructive' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteListing = async (listingId) => {
+    if (!window.confirm('Are you sure you want to delete this listing?')) return;
+    try {
+      await listingsAPI.delete(listingId);
+      toast({ title: 'Listing Deleted', description: 'The listing has been removed.' });
+      fetchListings();
+    } catch (err) {
+      console.error('Delete listing error:', err);
+      toast({ title: 'Delete Failed', description: err.response?.data?.error || err.message, variant: 'destructive' });
+    }
+  };
+
   const stats = {
     total: myListings.length,
     approved: myListings.filter(l => l.status === 'approved').length,
     pending: myListings.filter(l => l.status === 'pending').length,
-    requests: myRequests.length,
-  };
-
-  const handleCreateListing = (e) => {
-    e.preventDefault();
-    setIsDialogOpen(false);
-    toast({ title: 'Listing Submitted!', description: 'Your listing will be reviewed by our team before going live.' });
-  };
-
-  const handleDeleteListing = (listingId) => {
-    toast({ title: 'Listing Deleted', description: 'The listing has been removed.' });
-  };
-
-  const handleRequestAction = (requestId, action) => {
-    toast({
-      title: action === 'approve' ? 'Request Approved' : 'Request Rejected',
-      description: action === 'approve' ? 'The tenant can now view your contact details.' : 'The request has been declined.',
-    });
+    requests: 0, // Mock contacts since they are not fully stored in DB yet
   };
 
   const statusBadge = (status) => {
     switch (status) {
-      case 'approved': return <Badge className="badge-verified gap-1"><CheckCircle className="w-3 h-3" />Approved</Badge>;
-      case 'pending': return <Badge className="badge-pending gap-1"><Clock className="w-3 h-3" />Pending</Badge>;
-      case 'rejected': return <Badge variant="destructive" className="gap-1"><XCircle className="w-3 h-3" />Rejected</Badge>;
+      case 'approved':
+        return <Badge className="badge-verified gap-1"><CheckCircle className="w-3 h-3" />Approved</Badge>;
+      case 'pending':
+        return <Badge className="badge-pending gap-1"><Clock className="w-3 h-3" />Pending</Badge>;
+      case 'rejected':
+        return <Badge variant="destructive" className="gap-1"><XCircle className="w-3 h-3" />Rejected</Badge>;
+      default:
+        return <Badge variant="outline" className="gap-1"><Clock className="w-3 h-3" />{status}</Badge>;
     }
   };
 
@@ -66,18 +144,29 @@ export default function OwnerDashboard() {
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="accent" className="gap-2"><Plus className="w-4 h-4" />Add New Listing</Button>
+              <Button variant="accent" className="gap-2">
+                <Plus className="w-4 h-4" />Add New Listing
+              </Button>
             </DialogTrigger>
             <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
               <DialogHeader><DialogTitle>Create New Listing</DialogTitle></DialogHeader>
               <form onSubmit={handleCreateListing} className="space-y-4">
-                <div className="space-y-2"><Label htmlFor="title">Title</Label><Input id="title" placeholder="Cozy Room in Downtown" required /></div>
-                <div className="space-y-2"><Label htmlFor="description">Description</Label><Textarea id="description" placeholder="Describe your space..." rows={3} required /></div>
+                <div className="space-y-2">
+                  <Label htmlFor="title">Title</Label>
+                  <Input id="title" placeholder="Cozy Room in Downtown" value={title} onChange={(e) => setTitle(e.target.value)} required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea id="description" placeholder="Describe your space..." rows={3} value={description} onChange={(e) => setDescription(e.target.value)} required />
+                </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2"><Label htmlFor="rent">Monthly Rent (₹)</Label><Input id="rent" type="number" placeholder="12000" required /></div>
+                  <div className="space-y-2">
+                    <Label htmlFor="rent">Monthly Rent (₹)</Label>
+                    <Input id="rent" type="number" placeholder="12000" value={rent} onChange={(e) => setRent(e.target.value)} required />
+                  </div>
                   <div className="space-y-2">
                     <Label>Room Type</Label>
-                    <Select defaultValue="single">
+                    <Select value={sharingType} onValueChange={setSharingType}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="single">Single Room</SelectItem>
@@ -89,15 +178,33 @@ export default function OwnerDashboard() {
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2"><Label htmlFor="location">Locality</Label><Input id="location" placeholder="Koramangala 4th Block" required /></div>
-                  <div className="space-y-2"><Label htmlFor="city">City</Label><Input id="city" placeholder="Bengaluru" required /></div>
+                  <div className="space-y-2">
+                    <Label htmlFor="location">Locality</Label>
+                    <Input id="location" placeholder="Koramangala 4th Block" value={location} onChange={(e) => setLocation(e.target.value)} required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="city">City</Label>
+                    <Input id="city" placeholder="Bengaluru" value={city} onChange={(e) => setCity(e.target.value)} required />
+                  </div>
                 </div>
-                <div className="space-y-2"><Label htmlFor="facilities">Facilities (comma separated)</Label><Input id="facilities" placeholder="WiFi, AC, Kitchen" /></div>
-                <Button type="submit" className="w-full">Submit for Review</Button>
+                <div className="space-y-2">
+                  <Label htmlFor="facilities">Facilities (comma separated)</Label>
+                  <Input id="facilities" placeholder="WiFi, AC, Kitchen" value={facilities} onChange={(e) => setFacilities(e.target.value)} />
+                </div>
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Submitting...</> : 'Submit Listing'}
+                </Button>
               </form>
             </DialogContent>
           </Dialog>
         </div>
+
+        {error && (
+          <div className="flex items-center gap-3 p-4 bg-destructive/15 text-destructive rounded-xl mb-8 border border-destructive/20">
+            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            <p className="font-medium text-sm">{error}</p>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
@@ -123,64 +230,52 @@ export default function OwnerDashboard() {
         <Tabs defaultValue="listings">
           <TabsList className="mb-6">
             <TabsTrigger value="listings">My Listings</TabsTrigger>
-            <TabsTrigger value="requests">Contact Requests</TabsTrigger>
+            <TabsTrigger value="requests" disabled>Contact Requests</TabsTrigger>
           </TabsList>
           <TabsContent value="listings">
-            <div className="space-y-4">
-              {myListings.map((listing) => (
-                <Card key={listing.id} className="card-elevated">
-                  <CardContent className="p-4 md:p-6">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          {statusBadge(listing.status)}
-                          {listing.verified && <Badge variant="outline" className="gap-1"><CheckCircle className="w-3 h-3" />Verified</Badge>}
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center py-12 gap-4">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <p className="text-muted-foreground text-sm">Loading your properties...</p>
+              </div>
+            ) : myListings.length > 0 ? (
+              <div className="space-y-4">
+                {myListings.map((listing) => (
+                  <Card key={listing.id} className="card-elevated">
+                    <CardContent className="p-4 md:p-6">
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            {statusBadge(listing.status)}
+                            {listing.verified && <Badge variant="outline" className="gap-1"><CheckCircle className="w-3 h-3" />Verified</Badge>}
+                          </div>
+                          <h3 className="font-semibold text-lg text-foreground mb-1">{listing.title}</h3>
+                          <p className="text-muted-foreground text-sm mb-2">{listing.location}, {listing.city}</p>
+                          <p className="text-foreground font-medium">₹{listing.rent.toLocaleString('en-IN')}/month</p>
                         </div>
-                        <h3 className="font-semibold text-lg text-foreground mb-1">{listing.title}</h3>
-                        <p className="text-muted-foreground text-sm mb-2">{listing.location}, {listing.city}</p>
-                        <p className="text-foreground font-medium">₹{listing.rent.toLocaleString('en-IN')}/month</p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm" className="gap-1"><Eye className="w-4 h-4" />View</Button>
-                        <Button variant="outline" size="sm" className="gap-1"><Edit className="w-4 h-4" />Edit</Button>
-                        <Button variant="outline" size="sm" className="gap-1 text-destructive hover:text-destructive" onClick={() => handleDeleteListing(listing.id)}><Trash2 className="w-4 h-4" /></Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-          <TabsContent value="requests">
-            <div className="space-y-4">
-              {myRequests.length > 0 ? myRequests.map((request) => (
-                <Card key={request.id} className="card-elevated">
-                  <CardContent className="p-4 md:p-6">
-                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <Badge className="badge-pending mb-2">New Request</Badge>
-                        <h3 className="font-semibold text-foreground mb-1">Request for: {request.listingTitle}</h3>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                          <span className="flex items-center gap-1"><Mail className="w-4 h-4" />{request.fromUserName}</span>
-                          <span className="flex items-center gap-1"><Calendar className="w-4 h-4" />{request.createdAt.toLocaleDateString()}</span>
+                        <div className="flex gap-2">
+                          <Link to={`/listings/${listing.id}`}>
+                            <Button variant="outline" size="sm" className="gap-1"><Eye className="w-4 h-4" />View</Button>
+                          </Link>
+                          <Button variant="outline" size="sm" className="gap-1 text-destructive hover:text-destructive" onClick={() => handleDeleteListing(listing.id)}>
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
                         </div>
-                        <p className="text-muted-foreground">{request.message}</p>
                       </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" onClick={() => handleRequestAction(request.id, 'approve')}>Approve</Button>
-                        <Button variant="outline" size="sm" onClick={() => handleRequestAction(request.id, 'reject')}>Reject</Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )) : (
-                <div className="text-center py-12">
-                  <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-foreground mb-2">No Contact Requests</h3>
-                  <p className="text-muted-foreground">When tenants request contact, they'll appear here.</p>
-                </div>
-              )}
-            </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16 bg-card rounded-2xl border border-border/50">
+                <Home className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-foreground mb-2">No properties listed yet</h3>
+                <p className="text-muted-foreground mb-6">List your room, PG, or hostel to start receiving tenant queries!</p>
+                <Button variant="accent" onClick={() => setIsDialogOpen(true)} className="gap-2">
+                  <Plus className="w-4 h-4" />List Room Now
+                </Button>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>

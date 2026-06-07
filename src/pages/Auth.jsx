@@ -60,9 +60,13 @@ export default function Auth() {
     }
   };
 
-  const handleRoleSelect = (role) => {
-    selectRole(role);
-    toast({ title: 'Welcome!', description: `Your account has been created as ${role.replace('_', ' ')}.` });
+  const handleRoleSelect = async (role) => {
+    const success = await selectRole(role);
+    if (success) {
+      toast({ title: 'Welcome!', description: `Your account has been created as ${role.replace('_', ' ')}.` });
+    } else {
+      toast({ title: 'Registration Failed', description: 'Could not complete registration. The email may already be registered.', variant: 'destructive' });
+    }
   };
 
   if (mode === 'role-select') {
