@@ -30,6 +30,14 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Root Route
+app.get('/', (req, res) => {
+  res.status(200).json({
+    message: 'CoLiviMates Backend Running',
+    status: 'UP'
+  });
+});
+
 // Database Status Route
 app.get('/api/db-status', async (req, res) => {
   const startTime = Date.now();
