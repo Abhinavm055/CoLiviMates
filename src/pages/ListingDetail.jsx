@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
-import { listingsAPI } from '@/lib/api';
+import { listingsAPI, contactRequestsAPI } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -74,11 +74,23 @@ export default function ListingDetail() {
       return;
     }
     setSending(true);
-    // Mimic contacts API trigger wait time
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setSending(false);
-    setMessage('');
-    toast({ title: 'Request Sent!', description: 'The owner will review your request and get back to you.' });
+    try {
+      await contactRequestsAPI.create({
+        listingId: listing.id,
+        message: message.trim()
+      });
+      setMessage('');
+      toast({ title: 'Request Sent!', description: 'The owner will review your request and get back to you.' });
+    } catch (err) {
+      console.error('Failed to send contact request:', err);
+      toast({
+        title: 'Request Failed',
+        description: err.response?.data?.error || 'Could not send contact request. Please try again.',
+        variant: 'destructive'
+      });
+    } finally {
+      setSending(false);
+    }
   };
 
   if (isLoading) {

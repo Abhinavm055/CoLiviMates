@@ -5,6 +5,7 @@ const pool = require('./config/db');
 const authRoutes = require('./routes/auth');
 const listingRoutes = require('./routes/listings');
 const roommateRequestRoutes = require('./routes/roommateRequests');
+const contactRequestRoutes = require('./routes/contactRequests');
 
 const app = express();
 
@@ -64,6 +65,7 @@ app.get('/api/db-status', async (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/listings', listingRoutes);
 app.use('/api/roommate-requests', roommateRequestRoutes);
+app.use('/api/contact-requests', contactRequestRoutes);
 
 // Port configuration
 const PORT = process.env.PORT || 5000;

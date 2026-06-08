@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { useAuth } from '@/contexts/AuthContext';
-import { roommateRequestsAPI } from '@/lib/api';
+import { roommateRequestsAPI, contactRequestsAPI } from '@/lib/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Search, Users, Heart, MessageSquare, Edit, Trash2, MapPin, Loader2, AlertCircle } from 'lucide-react';
+import { Plus, Search, Users, Heart, MessageSquare, Edit, Trash2, MapPin, Loader2, AlertCircle, Mail, Calendar, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { Navigate, Link } from 'react-router-dom';
 
 export default function TenantDashboard() {
@@ -22,6 +22,9 @@ export default function TenantDashboard() {
   const [myRoommateRequests, setMyRoommateRequests] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [myContactRequests, setMyContactRequests] = useState([]);
+  const [isLoadingRequests, setIsLoadingRequests] = useState(false);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -59,9 +62,36 @@ export default function TenantDashboard() {
     }
   };
 
+  const fetchMyContactRequests = async () => {
+    if (!user) return;
+    setIsLoadingRequests(true);
+    try {
+      const data = await contactRequestsAPI.getTenantRequests();
+      setMyContactRequests(data.contactRequests);
+    } catch (err) {
+      console.error('Failed to fetch contact requests:', err);
+    } finally {
+      setIsLoadingRequests(false);
+    }
+  };
+
   useEffect(() => {
     fetchMyRequests();
+    fetchMyContactRequests();
   }, [user]);
+
+  const requestStatusBadge = (status) => {
+    switch (status) {
+      case 'accepted':
+        return <Badge className="badge-verified gap-1"><CheckCircle className="w-3 h-3" />Accepted</Badge>;
+      case 'pending':
+        return <Badge className="badge-pending gap-1"><Clock className="w-3 h-3" />Pending</Badge>;
+      case 'rejected':
+        return <Badge variant="destructive" className="gap-1"><XCircle className="w-3 h-3" />Rejected</Badge>;
+      default:
+        return <Badge variant="outline" className="gap-1">{status}</Badge>;
+    }
+  };
 
   if (!user || (user.role !== 'tenant' && user.role !== 'roommate_seeker')) return <Navigate to="/auth" replace />;
 
@@ -184,7 +214,7 @@ export default function TenantDashboard() {
           {[
             { label: 'Saved Listings', value: savedListings.length, icon: Heart },
             { label: 'My Requests', value: myRoommateRequests.length, icon: Users },
-            { label: 'Messages', value: 0, icon: MessageSquare },
+            { label: 'Contact Requests', value: myContactRequests.length, icon: MessageSquare },
           ].map((stat, i) => (
             <Card key={i}>
               <CardContent className="p-4 flex items-center gap-4">
@@ -204,6 +234,9 @@ export default function TenantDashboard() {
           <TabsList className="mb-6">
             <TabsTrigger value="requests">My Roommate Requests</TabsTrigger>
             <TabsTrigger value="saved">Saved Listings</TabsTrigger>
+            <TabsTrigger value="contact-requests" className="gap-2">
+              <MessageSquare className="w-4 h-4" />My Contact Requests ({myContactRequests.length})
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="requests">
             {isLoading ? (
@@ -259,6 +292,62 @@ export default function TenantDashboard() {
               <p className="text-muted-foreground mb-4">Browse listings and save the ones you like.</p>
               <Link to="/listings"><Button className="gap-2"><Search className="w-4 h-4" />Browse Listings</Button></Link>
             </div>
+          </TabsContent>
+          <TabsContent value="contact-requests">
+            {isLoadingRequests ? (
+              <div className="flex flex-col items-center justify-center py-12 gap-4">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <p className="text-muted-foreground text-sm font-medium">Fetching your contact requests...</p>
+              </div>
+            ) : myContactRequests.length > 0 ? (
+              <div className="space-y-4">
+                {myContactRequests.map((request) => (
+                  <Card key={request.id} className="card-elevated">
+                    <CardContent className="p-4 md:p-6">
+                      <div className="space-y-3">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <h3 className="font-semibold text-lg text-foreground">
+                            {request.listing_title}
+                          </h3>
+                          {requestStatusBadge(request.status)}
+                        </div>
+
+                        <div className="bg-muted/50 p-4 rounded-xl border border-border/30">
+                          <p className="text-foreground text-sm leading-relaxed whitespace-pre-wrap">"{request.message}"</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pt-2 text-sm text-muted-foreground">
+                          <div>
+                            <span className="font-semibold text-foreground">Owner:</span> {request.owner_name}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Mail className="w-4 h-4" />
+                            <a href={`mailto:${request.owner_email}`} className="text-primary hover:underline">{request.owner_email}</a>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4" />
+                            {new Date(request.created_at).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16 bg-card rounded-2xl border border-border/50">
+                <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-foreground mb-2">No Contact Requests Sent</h3>
+                <p className="text-muted-foreground mb-4">Inquire about room listings to connect with owners.</p>
+                <Link to="/listings"><Button className="gap-2"><Search className="w-4 h-4" />Browse Listings</Button></Link>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>

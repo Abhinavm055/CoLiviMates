@@ -54,3 +54,18 @@ CREATE TABLE IF NOT EXISTS roommate_requests (
 -- Indexes for roommate requests
 CREATE INDEX IF NOT EXISTS idx_roommate_requests_user_id ON roommate_requests(user_id);
 CREATE INDEX IF NOT EXISTS idx_roommate_requests_budget ON roommate_requests(budget);
+
+-- 4. Contact Requests Table
+CREATE TABLE IF NOT EXISTS contact_requests (
+    id SERIAL PRIMARY KEY,
+    listing_id INTEGER NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+    owner_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    tenant_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    message TEXT NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'pending', -- 'pending', 'accepted', 'rejected'
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_contact_requests_owner_id ON contact_requests(owner_id);
+CREATE INDEX IF NOT EXISTS idx_contact_requests_tenant_id ON contact_requests(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_contact_requests_listing_id ON contact_requests(listing_id);

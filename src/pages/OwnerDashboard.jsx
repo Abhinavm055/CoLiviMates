@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { useAuth } from '@/contexts/AuthContext';
-import { listingsAPI } from '@/lib/api';
+import { listingsAPI, contactRequestsAPI } from '@/lib/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +22,9 @@ export default function OwnerDashboard() {
   const [myListings, setMyListings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [contactRequests, setContactRequests] = useState([]);
+  const [isLoadingRequests, setIsLoadingRequests] = useState(false);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -51,8 +54,22 @@ export default function OwnerDashboard() {
     }
   };
 
+  const fetchContactRequests = async () => {
+    if (!user) return;
+    setIsLoadingRequests(true);
+    try {
+      const data = await contactRequestsAPI.getOwnerRequests();
+      setContactRequests(data.contactRequests);
+    } catch (err) {
+      console.error('Failed to load owner contact requests:', err);
+    } finally {
+      setIsLoadingRequests(false);
+    }
+  };
+
   useEffect(() => {
     fetchListings();
+    fetchContactRequests();
   }, [user]);
 
   if (!user || user.role !== 'owner') return <Navigate to="/auth" replace />;
@@ -118,7 +135,7 @@ export default function OwnerDashboard() {
     total: myListings.length,
     approved: myListings.filter(l => l.status === 'approved').length,
     pending: myListings.filter(l => l.status === 'pending').length,
-    requests: 0, // Mock contacts since they are not fully stored in DB yet
+    requests: contactRequests.length,
   };
 
   const statusBadge = (status) => {
@@ -131,6 +148,30 @@ export default function OwnerDashboard() {
         return <Badge variant="destructive" className="gap-1"><XCircle className="w-3 h-3" />Rejected</Badge>;
       default:
         return <Badge variant="outline" className="gap-1"><Clock className="w-3 h-3" />{status}</Badge>;
+    }
+  };
+
+  const requestStatusBadge = (status) => {
+    switch (status) {
+      case 'accepted':
+        return <Badge className="badge-verified gap-1"><CheckCircle className="w-3 h-3" />Accepted</Badge>;
+      case 'pending':
+        return <Badge className="badge-pending gap-1"><Clock className="w-3 h-3" />Pending</Badge>;
+      case 'rejected':
+        return <Badge variant="destructive" className="gap-1"><XCircle className="w-3 h-3" />Rejected</Badge>;
+      default:
+        return <Badge variant="outline" className="gap-1">{status}</Badge>;
+    }
+  };
+
+  const handleRequestStatusChange = async (requestId, newStatus) => {
+    try {
+      await contactRequestsAPI.updateStatus(requestId, newStatus);
+      toast({ title: 'Status Updated', description: `Request marked as ${newStatus}.` });
+      fetchContactRequests();
+    } catch (err) {
+      console.error('Failed to update request status:', err);
+      toast({ title: 'Update Failed', description: err.response?.data?.error || err.message, variant: 'destructive' });
     }
   };
 
@@ -230,7 +271,9 @@ export default function OwnerDashboard() {
         <Tabs defaultValue="listings">
           <TabsList className="mb-6">
             <TabsTrigger value="listings">My Listings</TabsTrigger>
-            <TabsTrigger value="requests" disabled>Contact Requests</TabsTrigger>
+            <TabsTrigger value="requests" className="gap-2">
+              <MessageSquare className="w-4 h-4" />Contact Requests ({contactRequests.length})
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="listings">
             {isLoading ? (
@@ -274,6 +317,87 @@ export default function OwnerDashboard() {
                 <Button variant="accent" onClick={() => setIsDialogOpen(true)} className="gap-2">
                   <Plus className="w-4 h-4" />List Room Now
                 </Button>
+              </div>
+            )}
+          </TabsContent>
+          <TabsContent value="requests">
+            {isLoadingRequests ? (
+              <div className="flex flex-col items-center justify-center py-12 gap-4">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <p className="text-muted-foreground text-sm">Loading contact requests...</p>
+              </div>
+            ) : contactRequests.length > 0 ? (
+              <div className="space-y-4">
+                {contactRequests.map((request) => (
+                  <Card key={request.id} className="card-elevated">
+                    <CardContent className="p-4 md:p-6">
+                      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                        <div className="flex-1 space-y-3">
+                          <div className="flex flex-wrap items-center gap-2">
+                            {requestStatusBadge(request.status)}
+                            <Badge variant="outline" className="gap-1">
+                              <Home className="w-3 h-3" />
+                              {request.listing_title}
+                            </Badge>
+                          </div>
+                          
+                          <div className="bg-muted/50 p-4 rounded-xl border border-border/30">
+                            <p className="text-foreground text-sm leading-relaxed whitespace-pre-wrap">"{request.message}"</p>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pt-2 text-sm">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <span className="font-semibold text-foreground">Tenant:</span>
+                              {request.tenant_name}
+                            </div>
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Mail className="w-4 h-4" />
+                              <a href={`mailto:${request.tenant_email}`} className="text-primary hover:underline">{request.tenant_email}</a>
+                            </div>
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Calendar className="w-4 h-4" />
+                              {new Date(request.created_at).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </div>
+                          </div>
+                        </div>
+
+                        {request.status === 'pending' && (
+                          <div className="flex gap-2 self-start md:self-center">
+                            <Button
+                              size="sm"
+                              className="gap-1"
+                              onClick={() => handleRequestStatusChange(request.id, 'accepted')}
+                            >
+                              <CheckCircle className="w-4 h-4" />
+                              Accept
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-1 text-destructive hover:bg-destructive/10"
+                              onClick={() => handleRequestStatusChange(request.id, 'rejected')}
+                            >
+                              <XCircle className="w-4 h-4" />
+                              Reject
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16 bg-card rounded-2xl border border-border/50">
+                <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-foreground mb-2">No contact requests</h3>
+                <p className="text-muted-foreground">When tenants inquire about your rooms, their messages will appear here.</p>
               </div>
             )}
           </TabsContent>

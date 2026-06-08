@@ -128,4 +128,24 @@ export const roommateRequestsAPI = {
   },
 };
 
+// Contact Requests endpoints
+export const contactRequestsAPI = {
+  create: async (data) => {
+    const response = await api.post('/contact-requests', data);
+    return response.data;
+  },
+  getOwnerRequests: async () => {
+    const response = await api.get('/contact-requests/owner');
+    return response.data;
+  },
+  getTenantRequests: async () => {
+    const response = await api.get('/contact-requests/tenant');
+    return response.data;
+  },
+  updateStatus: async (id, status) => {
+    const response = await api.put(`/contact-requests/${id}/status`, { status });
+    return response.data;
+  },
+};
+
 export default api;
