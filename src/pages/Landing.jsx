@@ -185,7 +185,7 @@ export default function Landing() {
                 Your Perfect PG is Waiting! 🏠
               </h2>
               <p className="text-primary-foreground/85 text-lg mb-8 max-w-2xl mx-auto">
-                Join thousands of students and freshers who found affordable stays through StayNest. Start your search today – it's 100% free!
+                Join thousands of students and freshers who found affordable stays through CoLiviMates. Start your search today – it's 100% free!
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link to="/listings">

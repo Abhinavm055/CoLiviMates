@@ -12,7 +12,7 @@ export function Footer() {
               <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
                 <Home className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="font-bold text-lg text-foreground">CoLiving</span>
+              <span className="font-bold text-lg text-foreground">CoLiviMates</span>
             </Link>
             <p className="text-muted-foreground max-w-sm">
               Find affordable rooms and compatible roommates in your city. Your perfect living space is just a click away.
@@ -47,7 +47,7 @@ export function Footer() {
             <ul className="space-y-2">
               <li className="flex items-center gap-2 text-muted-foreground">
                 <Mail className="w-4 h-4" />
-                hello@coliving.com
+                hello@colivimates.com
               </li>
               <li className="flex items-center gap-2 text-muted-foreground">
                 <Phone className="w-4 h-4" />
@@ -58,7 +58,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground text-sm">
-          <p>&copy; {new Date().getFullYear()} CoLiving. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} CoLiviMates. All rights reserved.</p>
         </div>
       </div>
     </footer>

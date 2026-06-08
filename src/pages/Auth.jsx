@@ -44,7 +44,7 @@ export default function Auth() {
     e.preventDefault();
     const success = await login(email, password);
     if (!success) {
-      toast({ title: 'Login Failed', description: 'Invalid email or password. Try: admin@staynest.in, owner@example.com, or tenant@example.com', variant: 'destructive' });
+      toast({ title: 'Login Failed', description: 'Invalid email or password. Try: admin@colivimates.in, owner@example.com, or tenant@example.com', variant: 'destructive' });
     }
   };
 
@@ -75,7 +75,7 @@ export default function Auth() {
         <div className="container mx-auto px-4 py-16 max-w-2xl">
           <div className="text-center mb-10">
             <h1 className="text-3xl font-bold text-foreground mb-2">Choose Your Role</h1>
-            <p className="text-muted-foreground">Select how you want to use CoLiving</p>
+            <p className="text-muted-foreground">Select how you want to use CoLiviMates</p>
           </div>
           <div className="grid gap-4">
             {roles.map(({ role, title, description, icon }) => (
@@ -140,7 +140,7 @@ export default function Auth() {
               <div className="mt-6 p-4 bg-muted rounded-lg">
                 <p className="text-xs text-muted-foreground mb-2">Demo accounts:</p>
                 <ul className="text-xs text-muted-foreground space-y-1">
-                  <li><strong>Admin:</strong> admin@staynest.in</li>
+                  <li><strong>Admin:</strong> admin@colivimates.in</li>
                   <li><strong>Owner:</strong> owner@example.com</li>
                   <li><strong>Tenant:</strong> tenant@example.com</li>
                 </ul>
